@@ -12,7 +12,8 @@ import Prelude hiding (filter, foldl, foldr, head, init, last, length, map, read
 -- You can reuse already implemented functions from Task1
 -- by listing them in this import clause
 -- NOTE: only listed functions are imported, everything else remains hidden
-import Task1 (map, reverse, sum)
+import Task1 (map, reverse, sum, doubleEveryOther, toDigits)
+import Text.Printf (IsChar(fromChar))
 
 -----------------------------------
 --
@@ -25,8 +26,12 @@ import Task1 (map, reverse, sum)
 -- 1
 
 luhnModN :: Int -> (a -> Int) -> [a] -> Int
-luhnModN = error "TODO: define luhnModN"
+luhnModN n mapping xs = (n - (sum (map (normalizeModN n) (doubleEveryOther (reverse (map mapping xs)))) `mod` n)) `mod` n
 
+normalizeModN :: Int -> Int -> Int
+normalizeModN n x
+    | x < n    = x
+    | otherwise = x - (n - 1)
 -----------------------------------
 --
 -- Computes decimal check digit for given digits using Luhn algorithm mod 10
@@ -37,7 +42,7 @@ luhnModN = error "TODO: define luhnModN"
 -- 1
 
 luhnDec :: [Int] -> Int
-luhnDec = error "TODO: define luhnDec"
+luhnDec = luhnModN 10 id
 
 -----------------------------------
 --
@@ -47,9 +52,10 @@ luhnDec = error "TODO: define luhnDec"
 --
 -- >>> luhnHex "123abc"
 -- 15
+-- >>> luhnHex 
 
 luhnHex :: [Char] -> Int
-luhnHex = error "TODO: define luhnHex"
+luhnHex = luhnModN 16 digitToInt
 
 -----------------------------------
 --
@@ -65,7 +71,31 @@ luhnHex = error "TODO: define luhnHex"
 -- [10,11,12,13,14,15]
 
 digitToInt :: Char -> Int
-digitToInt = error "TODO: define digitToInt"
+digitToInt c
+    | inBound c '0' '9' = fromEnum c - fromEnum '0'
+    | inBound c 'a' 'f' = fromEnum c - fromEnum 'a' + 10
+    | inBound c 'A' 'F' = fromEnum c - fromEnum 'A' + 10
+    | otherwise          = 0
+
+inBound :: Ord a => a -> a -> a -> Bool
+inBound x a b = a <= x && x <= b
+
+
+validateModN :: Int -> (a -> Int) -> [a] -> Bool
+validateModN n mapping xs = luhnModN n mapping (withoutLast xs) == mapping (last xs)
+
+last :: [a] -> a
+last [] = error "Empty list"
+last [x] = x
+last (_:xs) = last xs
+
+-- >>> withoutLast "123abcf"
+-- "123abc"
+
+withoutLast :: [a] -> [a]
+withoutLast [] = []
+withoutLast [_] = []
+withoutLast (x:xs) = x : withoutLast xs
 
 -----------------------------------
 --
@@ -82,7 +112,7 @@ digitToInt = error "TODO: define digitToInt"
 -- False
 
 validateDec :: Integer -> Bool
-validateDec = error "TODO: define validateDec"
+validateDec x = validateModN 10 id (toDigits x)
 
 -----------------------------------
 --
@@ -99,4 +129,4 @@ validateDec = error "TODO: define validateDec"
 -- False
 
 validateHex :: [Char] -> Bool
-validateHex = error "TODO: define validateHex"
+validateHex = validateModN 16 digitToInt

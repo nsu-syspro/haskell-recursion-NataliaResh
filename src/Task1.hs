@@ -97,8 +97,8 @@ toDigits n
 -- []
 
 reverse :: [a] -> [a]
+reverse []     = []
 reverse (x:xs) = reverse xs ++ [x]
-reverse x      = x
 
 -----------------------------------
 --
@@ -116,8 +116,7 @@ reverse x      = x
 doubleEveryOther :: [Int] -> [Int]
 doubleEveryOther []         = []
 doubleEveryOther [x]        = [x * 2]
-doubleEveryOther [x1, x2]   = [x1 * 2, x2]
-doubleEveryOther (x1:x2:xs) = doubleEveryOther [x1, x2] ++ doubleEveryOther xs
+doubleEveryOther (x1:x2:xs) = x1 * 2 : x2 : doubleEveryOther xs
 
 -----------------------------------
 --
@@ -155,8 +154,8 @@ normalize n
 -- [1,2,3]
 
 map :: (a -> b) -> [a] -> [b]
-map _ []   = []
-map f [x]  = [f x]
+map _ []     = []
+map f [x]    = [f x]
 map f (x:xs) = f x : map f xs
 
 -----------------------------------

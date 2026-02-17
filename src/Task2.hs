@@ -30,7 +30,7 @@ luhnModN n mapping xs = (n - (sum (map (normalizeModN n) (doubleEveryOther (reve
 
 normalizeModN :: Int -> Int -> Int
 normalizeModN n x
-    | x < n    = x
+    | x < n     = x
     | otherwise = x - (n - 1)
 -----------------------------------
 --
@@ -82,20 +82,20 @@ inBound x a b = a <= x && x <= b
 
 
 validateModN :: Int -> (a -> Int) -> [a] -> Bool
-validateModN n mapping xs = luhnModN n mapping (withoutLast xs) == mapping (last xs)
+validateModN n mapping xs = luhnModN n mapping (init xs) == mapping (last xs)
 
 last :: [a] -> a
-last [] = error "Empty list"
-last [x] = x
+last []     = error "Empty list"
+last [x]    = x
 last (_:xs) = last xs
 
--- >>> withoutLast "123abcf"
+-- >>> init "123abcf"
 -- "123abc"
 
-withoutLast :: [a] -> [a]
-withoutLast [] = []
-withoutLast [_] = []
-withoutLast (x:xs) = x : withoutLast xs
+init :: [a] -> [a]
+init []     = []
+init [_]    = []
+init (x:xs) = x : init xs
 
 -----------------------------------
 --

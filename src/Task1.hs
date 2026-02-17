@@ -20,9 +20,31 @@ import Prelude hiding (filter, foldl, foldr, head, init, last, length, map, read
 -- True
 -- >>> validate 34562
 -- False
+-- >>> validate 17893729974
+-- True
+-- >>> validate 17893729971
+-- False
+-- >>> validate 18
+-- True
+-- >>> validate 7
+-- False
+-- >>> validate 0
+-- False
+-- >>> validate 1
+-- False
 
 validate :: Integer -> Bool
-validate = error "TODO: define validate"
+validate n
+    | n <= 0    = False
+    | otherwise = luhn (toDigits (withoutLastDigit n)) == lastDigit n
+
+lastDigit :: Integer -> Int
+lastDigit n = fromIntegral n `mod` 10
+
+withoutLastDigit :: Integer -> Integer
+withoutLastDigit n
+    | n < 10    = 0
+    | otherwise = n `div` 10
 
 -----------------------------------
 --
@@ -32,9 +54,11 @@ validate = error "TODO: define validate"
 --
 -- >>> luhn [3,4,5,6]
 -- 1
+-- >>> luhn [1,7,8,9,3,7,2,9,9,7]
+-- 4
 
 luhn :: [Int] -> Int
-luhn = error "TODO: define luhn"
+luhn xs = (10 - (sum (map normalize (doubleEveryOther (reverse xs))) `mod` 10)) `mod` 10
 
 -----------------------------------
 --
@@ -49,9 +73,13 @@ luhn = error "TODO: define luhn"
 -- []
 -- >>> toDigits (-123)
 -- []
+-- >>> toDigits 10455464576576
+-- [1,0,4,5,5,4,6,4,5,7,6,5,7,6]
 
 toDigits :: Integer -> [Int]
-toDigits = error "TODO: define toDigits"
+toDigits n
+    | n <= 0    = []
+    | otherwise = toDigits (withoutLastDigit n) ++ [lastDigit n]
 
 -----------------------------------
 --
@@ -63,9 +91,14 @@ toDigits = error "TODO: define toDigits"
 -- "olleH"
 -- >>> reverse [3,4,5,6]
 -- [6,5,4,3]
+-- >>> reverse [1]
+-- [1]
+--- >>> reverse []
+-- []
 
 reverse :: [a] -> [a]
-reverse = error "TODO: define reverse"
+reverse []     = []
+reverse (x:xs) = reverse xs ++ [x]
 
 -----------------------------------
 --
@@ -75,9 +108,15 @@ reverse = error "TODO: define reverse"
 --
 -- >>> doubleEveryOther [6,5,4,3]
 -- [12,5,8,3]
+-- >>> doubleEveryOther [1]
+-- [2]
+-- >>> doubleEveryOther [1, 2]
+-- [2,2]
 
 doubleEveryOther :: [Int] -> [Int]
-doubleEveryOther = error "TODO: define doubleEveryOther"
+doubleEveryOther []         = []
+doubleEveryOther [x]        = [x * 2]
+doubleEveryOther (x1:x2:xs) = x1 * 2 : x2 : doubleEveryOther xs
 
 -----------------------------------
 --
@@ -92,9 +131,15 @@ doubleEveryOther = error "TODO: define doubleEveryOther"
 -- 3
 -- >>> normalize 1
 -- 1
+-- >>> normalize 0
+-- 0
+-- >>> normalize 10
+-- 1
 
 normalize :: Int -> Int
-normalize = error "TODO: define normalize"
+normalize n
+    | n < 10    = n
+    | otherwise = n - 9
 
 -----------------------------------
 --
@@ -105,9 +150,13 @@ normalize = error "TODO: define normalize"
 --
 -- >>> map (\x -> x * 2) [1,2,3,4]
 -- [2,4,6,8]
+--- >>> map (+ 1) [0, 1, 2]
+-- [1,2,3]
 
 map :: (a -> b) -> [a] -> [b]
-map = error "TODO: define map"
+map _ []     = []
+map f [x]    = [f x]
+map f (x:xs) = f x : map f xs
 
 -----------------------------------
 --
@@ -121,4 +170,6 @@ map = error "TODO: define map"
 -- 0
 
 sum :: [Int] -> Int
-sum = error "TODO: define sum"
+sum []     = 0
+sum [x]    = x
+sum (x:xs) = x + sum xs
